@@ -6,6 +6,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import label_binarize
 import shap
 import warnings
+import os
+
 warnings.filterwarnings("ignore")
 
 
@@ -18,20 +20,19 @@ class MLModel:
         self.n_classes = 3
 
     def _build_model(self):
+        is_prod = os.environ.get("RENDER", False)
         return XGBClassifier(
-            n_estimators=300,
-            max_depth=4,
-            learning_rate=0.03,
+            n_estimators=100 if is_prod else 300,
+            max_depth=3 if is_prod else 4,
+            learning_rate=0.1 if is_prod else 0.03,
             subsample=0.8,
             colsample_bytree=0.8,
             min_child_weight=5,
-            gamma=0.1,
-            reg_alpha=0.1,
-            reg_lambda=1.0,
             num_class=3,
             objective="multi:softprob",
             eval_metric="mlogloss",
             random_state=42,
+            n_jobs=1,
         )
 
     def train(self, df: pd.DataFrame, feature_cols: list) -> dict:
