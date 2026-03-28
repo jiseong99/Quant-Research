@@ -31,9 +31,6 @@ rag = RAGAnalyzer()
 
 @app.get("/analyze/{ticker}")
 def analyze(ticker: str, period: str = "2y"):
-    import os
-    if os.environ.get("RENDER"):
-        period = "1y"
     try:
         df = dc.get_price_data(ticker, period)
         if df.empty:

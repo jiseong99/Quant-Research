@@ -26,9 +26,11 @@ class DataCollector:
         return ticker
 
     def get_price_data(self, ticker: str, period: str = "1y") -> pd.DataFrame:
-        ticker = self.normalize_ticker(ticker)
-        stock = yf.Ticker(ticker)
-        df = stock.history(period=period)
+        import yfinance as yf
+        ticker_obj = yf.Ticker(ticker)
+        df = ticker_obj.history(period=period, timeout=30)
+        if df.empty:
+            df = ticker_obj.history(period="1y", timeout=30)
         df.index = pd.to_datetime(df.index).tz_localize(None)
         return df[["Open", "High", "Low", "Close", "Volume"]]
 
